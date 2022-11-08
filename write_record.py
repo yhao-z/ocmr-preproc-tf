@@ -25,6 +25,8 @@ def data_example(label):
     k_shape = k.shape
     k = k.flatten()
 
+    # don't worry about the dtype of k & label
+    # .tolist() convert the data into python float no matter how
     feature = {
         'k_real': _float_feature(k.real.tolist()),
         'k_imag': _float_feature(k.imag.tolist()),
