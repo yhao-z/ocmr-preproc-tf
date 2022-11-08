@@ -1,12 +1,12 @@
 import numpy as np
 
-def espirit_csm(X, k=6, r=24, t=0.01, c=0.9925):
-    maps = espirit(X, k, r, t, c)
-    csm  = maps[..., 0] # Select the first coil map (coil sensitivity map, csm) of espirit maps, cuz the first contains the most info
+def espirit_csm(X, k=6, r=24, t=0.01, c=0.95):
+    csm = espirit(X, k, r, t, c)
     return csm
   
 
-#%% the following codes are borrowed from [mikgroup/espirit-python](https://github.com/mikgroup/espirit-python) repo, nothing changed
+#%% the following codes are borrowed from [mikgroup/espirit-python](https://github.com/mikgroup/espirit-python) repo
+# only the 96 - 102 lines are changed, nothing else change
 # - 2022/11/07
 # - @yhao-zhang
 
@@ -92,11 +92,13 @@ def espirit(X, k, r, t, c):
                 Gq = kerimgs[idx,jdx,kdx,:,:]
 
                 u, s, vh = np.linalg.svd(Gq, full_matrices=True)
-                for ldx in range(0, nc):
-                    if (s[ldx]**2 > c):
-                        maps[idx, jdx, kdx, :, ldx] = u[:, ldx]
+                # for ldx in range(0, nc):
+                #     if (s[ldx]**2 > c):
+                #         maps[idx, jdx, kdx, :, ldx] = u[:, ldx]
+                if (s[0]**2 > c): # only the map w.r.t. the biggest eigenvalue is chosen
+                    maps[idx, jdx, kdx, :, 0] = u[:, 0]
 
-    return maps
+    return maps[:,:,:,:,0]
 
 def espirit_proj(x, esp):
     """
