@@ -28,7 +28,7 @@ click [HERE](https://ocmr.s3.amazonaws.com/data/ocmr_cine.tar.gz) to download th
 
 ### 2.2 divide the data into train/val/test
 
-see `devide_info.md`
+see [devide_info.md](divide_info.md)
 
 ### 2.3 env & requirements
 
