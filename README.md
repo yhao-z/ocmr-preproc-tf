@@ -1,6 +1,6 @@
 # ocmr-preproc-tf
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/yhao-z/ocmr-preproc-tf&display_name=tag&style=flat) ![tf](https://img.shields.io/badge/Tensorflow-2.9.0-blue) ![data](https://img.shields.io/badge/Dataset-OCMR-brightgreen)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/yhao-z/ocmr-preproc-tf?color=orange&display_name=tag) ![tf](https://img.shields.io/badge/Tensorflow-2.9.0-blue) ![data](https://img.shields.io/badge/Dataset-OCMR-brightgreen)
 
 This is a pipeline in `Tensorflow` framework to preprocess the `OCMR (Open-Access Multi-Coil k-Space Dataset for Cardiovascular Magnetic Resonance Imaging)` dataset into the `.tfrecord` files.
 
