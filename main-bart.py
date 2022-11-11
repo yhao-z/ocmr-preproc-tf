@@ -60,15 +60,18 @@ def test_tfrecord(filename):
     len = 0
     for step, sample in enumerate(dataset):
         len = len + 1
+        k, label = sample
 
         if step == 0:
-            k, label = sample
             plt.figure()
             plt.subplot(1,2,1)
             plt.imshow(np.abs(k[0, 0, ...]), 'gray')
             plt.subplot(1,2,2)
             plt.imshow(np.abs(label[0, 0, ...]), 'gray')
             plt.savefig('./test_pic.png')
+        
+        if label.shape != [1, 16, 64, 64]:
+            print('strange data')
     print(len)
 
     
@@ -126,8 +129,11 @@ def make_dataset(filedir, outdir, mode):
     
 if __name__ == '__main__':
 
-    make_dataset('/workspace/data/OCMR/orig_h5/train/', '/workspace/data/OCMR/tfrecord/standard/', 'train')
-    test_tfrecord('/workspace/data/OCMR/tfrecord/standard/ocmr_train.tfrecord')
+    filesdir = '/workspace/data/OCMR/orig_h5/train/'
+    outdir = '/workspace/data/OCMR/tfrecord/standard/'
+    mode = 'train'
+    make_dataset(filesdir, outdir, mode)
+    test_tfrecord(outdir + '/ocmr_' + mode + '.tfrecord')
 
 
 

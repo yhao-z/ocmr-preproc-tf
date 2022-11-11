@@ -1,0 +1,4 @@
+ismrmrd==1.12.5
+matplotlib==3.5.2
+numpy==1.22.3
+tensorflow==2.9.0

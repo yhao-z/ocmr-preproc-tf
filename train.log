@@ -1,4 +1,4 @@
-2022-11-08 09:08:11.305265: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2022-11-11 03:45:31.062960: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
 53
 ********* data fs_0018_3T.h5 processing **********
 Imaging acquisition starts acq  0
@@ -283,8 +283,8 @@ Done.
 Done.
 Done.
 Done.
-2022-11-08 09:37:38.724755: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
+2022-11-11 04:14:30.039777: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
 To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2022-11-08 09:37:39.415618: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1532] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 29539 MB memory:  -> device: 0, name: Quadro GV100, pci bus id: 0000:2d:00.0, compute capability: 7.0
+2022-11-11 04:14:30.539682: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1532] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 29671 MB memory:  -> device: 0, name: Quadro GV100, pci bus id: 0000:2d:00.0, compute capability: 7.0
 dataset loaded.
-2491
+4207
