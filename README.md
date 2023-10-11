@@ -22,7 +22,7 @@ We note that the `num` of fully sampled data of `OCMR` is 204, and we divide the
 
 We use ESPIRiT method to estimate the coil sensitivity maps of the multi-coil images and then merge them into single-coil images.
 
-We perform the data augmentation for the training data, i.e., crop the single-coil data  into `64×64×16 (x,y,t)` with the step of `32×32×8`. Eventually, we get **4207** training images.
+We perform the data augmentation for the training data, i.e., crop the single-coil data  into `128×128×16 (x,y,t)` with the step of `32×32×8`. Eventually, we get **1848** training images.
 
 ## 1. get the preprocessed tfrecord file
 
