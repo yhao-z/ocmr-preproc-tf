@@ -12,7 +12,18 @@ def get_dataset(filenames, batch_size, shuffle=False):
     return dataset
 
 
-def parse_function(example_proto):
+# load data
+def get_dataset_multicoil(filenames, batch_size, shuffle=False):
+    dataset = tf.data.TFRecordDataset(filenames)
+    dataset = dataset.map(multicoil_parse_function)
+    if shuffle:
+        dataset = dataset.shuffle(buffer_size=50)
+    dataset = dataset.batch(batch_size)
+
+    return dataset
+
+
+def multicoil_parse_function(example_proto):
     dics = {'k_real': tf.io.VarLenFeature(dtype=tf.float32),
             'k_imag': tf.io.VarLenFeature(dtype=tf.float32),
             'csm_real': tf.io.VarLenFeature(dtype=tf.float32),

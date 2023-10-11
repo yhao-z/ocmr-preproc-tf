@@ -5,14 +5,14 @@ import tensorflow as tf
 import glob
 import time
 import os
-
+import scipy.io as scio
 # functional import
 from utils import *
 from bart import bart
 import read_ocmr as read
 from espirit import espirit_csm
-from write_record import data_example
-from dataset_tfrecord import get_dataset
+from write_record import data_example_multicoil
+from dataset_tfrecord import get_dataset, get_dataset_multicoil
 
 
 
@@ -55,32 +55,38 @@ def test_tfrecord(filename):
         visualize the already-to-use dataset to check
         
     '''
-    dataset = get_dataset(filename, 1)
+    dataset = get_dataset_multicoil(filename, 1)
     tf.print('dataset loaded.')
 
     len = 0
     for step, sample in enumerate(dataset):
         len = len + 1
-        k, label = sample
+        k, csm = sample
+        # print(k.shape)
+        # print(csm.shape)
 
         if step == 0:
+            scio.savemat('val1.mat', {'k':k.numpy()})
             plt.figure()
             plt.subplot(1,2,1)
-            plt.imshow(np.abs(k[0, 0, ...]), 'gray')
+            plt.imshow(np.abs(ifft2c_mri(k[0, 0, 0, ...].numpy())), 'gray')
             plt.subplot(1,2,2)
-            plt.imshow(np.abs(label[0, 0, ...]), 'gray')
+            plt.imshow(np.abs(csm[0, 0, 0, ...]), 'gray')
             plt.savefig('./test_pic.png')
-        
-        if label.shape != [1, 16, 128, 128]:
-            print('strange data')
     print(len)
 
     
 def make_dataset(filedir, outdir, mode):
     filenames = glob.glob(filedir + '/*.h5')
+    # print(filenames.split('/')[-1])
     print(len(filenames))
-    writer = tf.io.TFRecordWriter(outdir+'ocmr_'+mode+'.tfrecord')
-    for filename in filenames:    
+    if mode == 'val' or 'test':
+        writer = tf.io.TFRecordWriter(outdir+'ocmr_multicoil_'+mode+'.tfrecord')
+    for filename in filenames:   
+        f__ = filename.split('/')[-1]
+        f__ = f__.split('.')[0]
+        if mode == 'train':
+            writer = tf.io.TFRecordWriter(outdir+f__+'.tfrecord') 
         print(f"********* data {filename.split('/')[-1]} processing **********")    
         k_orig, _ = read.read_ocmr(filename) # read k-space data
         print(k_orig.shape)
@@ -91,50 +97,74 @@ def make_dataset(filedir, outdir, mode):
             for a in range(avgs):
                 # set & rep are always 1 in fs data
                 k = k_orig[..., 0, s, 0, a] # [kx, ky, kz, coil, phase]
-                x = ifft(k, (0, 1, 2)) # the MR multicoil images
+                # x = ifft(k, (0, 1, 2)) # the MR multicoil images
                 
-                # use the first phase to estimate coil sensitivity(csm)
-                # bart espirit (default) [mriron/bart](https://github.com/mrirecon/bart)
-                # cuz bart takes 1s while python one takes 100s. bart is fast
-                csm = bart(1, 'ecalib -m1', k[..., 0]) 
-                ## python espirit 
-                # csm = espirit_csm(k[..., 0]) 
+                k = np.transpose(k.squeeze(), [2,3,0,1]) # [coil, phase, kx, ky]
+                print(k.shape)
                 
-                ## compare the bart and the python one by this
-                # bart_or_pytn(k)
+                x = ifft2c_mri(k)
+                nx = x.shape[-2]
+                x = x[...,int(np.ceil(nx/4)):int(np.ceil(nx/4*3)),:]
                 
-                # merge the multicoil images into single image
-                singleImg = np.zeros_like(x[..., 0, :]) # [kx, ky, kz, phase]
-                for coil in range(0, k.shape[3]):
-                    singleImg = singleImg + x[:, :, :, coil, :] * csm[:, :, :, coil, None].conj()
-                
-                singleImg = singleImg.squeeze() # squeeze the kz dimension, cuz kz is always 1 in fs data [kx, ky, phase]
-                nx = singleImg.shape[0]
-                singleImg = singleImg[int(np.ceil(nx/4)):int(np.ceil(nx/4*3)),:,:] # crop the center part of the image, cuz the fs data is oversampled (see ocmr example)
-                singleImg = np.transpose(singleImg, (2, 0, 1)) # [phase, kx, ky]
-                
+                # data = crop_multicoil(x)
+
                 # plt.figure(), plt.imshow(np.abs(singleImg[0,...])), plt.savefig('singleImg.png')
-        
+                
                 if mode == 'train':
                     # [data enhancement] crop the data into small blocks
-                    data = crop(singleImg)
+                    data = crop_multicoil(x)
                 elif mode == 'test' or 'val':
-                    data = [singleImg]
+                    data = [x]
 
                 # write the tfrecord
                 for i in range(len(data)):
-                    exam = data_example(data[i])
+                    img = data[i].sum(1)
+                    k0 = fft2c_mri(img)[..., None].transpose((1,2,3,0))
+                    csm = bart(1, 'ecalib -m1', k0)
+                    csm = np.transpose(csm, [3,2,0,1])
+                    
+                    exam = data_example_multicoil(fft2c_mri(data[i]), csm)
                     writer.write(exam.SerializeToString())
-    writer.close()
+        writer.close() if mode=='train' else None
+    writer.close() if mode=='val' or 'test' else None
+    
     
     
 if __name__ == '__main__':
-
-    filesdir = '/workspace/data/OCMR/orig_h5/train/'
-    outdir = '/workspace/data/OCMR/tfrecord/standard128/'
+    
     mode = 'train'
+    filesdir = '/workspace/data/OCMR/orig_h5/train/'
+    outdir = '/workspace/E/ocmr/train/'
+    if os.path.exists(outdir):
+        print('outpath exists')
+    else:
+        os.makedirs(outdir)
+    
     make_dataset(filesdir, outdir, mode)
-    test_tfrecord(outdir + '/ocmr_' + mode + '.tfrecord')
+    test_tfrecord(glob.glob(outdir + '/*.tfrecord'))
+
+    mode = 'val'
+    filesdir = '/workspace/data/OCMR/orig_h5/val/'
+    outdir = '/workspace/E/ocmr/val/'
+    if os.path.exists(outdir):
+        print('outpath exists')
+    else:
+        os.makedirs(outdir)
+    
+    make_dataset(filesdir, outdir, mode)
+    test_tfrecord(glob.glob(outdir + '/*.tfrecord'))
+    
+    
+    mode = 'test'
+    filesdir = '/workspace/data/OCMR/orig_h5/test/'
+    outdir = '/workspace/E/ocmr/test/'
+    if os.path.exists(outdir):
+        print('outpath exists')
+    else:
+        os.makedirs(outdir)
+    
+    make_dataset(filesdir, outdir, mode)
+    test_tfrecord(glob.glob(outdir + '/*.tfrecord'))
 
 
 

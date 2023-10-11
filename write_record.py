@@ -39,3 +39,26 @@ def data_example(label):
     exam = tf.train.Example(features=tf.train.Features(feature=feature))
 
     return exam
+
+
+# 创建图像数据的Example
+def data_example_multicoil(k, csm):
+    k_shape = k.shape
+    k = k.flatten()
+    csm_shape = csm.shape
+    csm = csm.flatten()
+
+    # don't worry about the dtype of k & label
+    # .tolist() convert the data into python float no matter how
+    feature = {
+        'k_real': _float_feature(k.real.tolist()),
+        'k_imag': _float_feature(k.imag.tolist()),
+        'csm_real': _float_feature(csm.real.tolist()),
+        'csm_imag': _float_feature(csm.imag.tolist()),
+        'k_shape': _int64_feature(list(k_shape)),
+        'csm_shape': _int64_feature(list(csm_shape))
+    }
+
+    exam = tf.train.Example(features=tf.train.Features(feature=feature))
+
+    return exam
