@@ -2,7 +2,7 @@
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/yhao-z/ocmr-preproc-tf?color=orange&display_name=tag) ![tf](https://img.shields.io/badge/Tensorflow-2.9.0-blue) ![data](https://img.shields.io/badge/Dataset-OCMR-brightgreen)
 
-This is a pipeline in `Tensorflow` framework to preprocess the `OCMR (Open-Access Multi-Coil k-Space Dataset for Cardiovascular Magnetic Resonance Imaging)` dataset into the `.tfrecord` files.
+This is a pipeline in `Tensorflow` framework to preprocess the `OCMR (Open-Access Multi-Coil k-Space Dataset for Cardiovascular Magnetic Resonance Imaging)` dataset into the `.tfrecord` files, including single-coil and multi-coil processing.
 
 You can attach the details of the `OCMR` dataset by the following materials.
 
@@ -20,17 +20,19 @@ You can attach the details of the `OCMR` dataset by the following materials.
 
 We note that the `num` of fully sampled data of `OCMR` is 204, and we divide the data into 124 for training; 40 for validation; and 40 for test, see [devide_info.md](divide_info.md) for the definition of `num` and more info. The ratio of train, validation and test is about 7:2:2.
 
-We use ESPIRiT method to estimate the coil sensitivity maps of the multi-coil images and then merge them into single-coil images.
+We use ESPIRiT method to estimate the coil sensitivity maps of the multi-coil images.
 
-We perform the data augmentation for the training data, i.e., crop the single-coil data  into `128×128×16 (x,y,t)` with the step of `32×32×8`. Eventually, we get **1848** training images.
+We perform the data augmentation for the training data, i.e., crop the data  into `128×128×16 (x,y,t)` with the step of `32×32×8`. Eventually, we get **1848** training samples.
 
 ## 1. get the preprocessed tfrecord file
 
-You can download the preprocessed tfrecord files via [my onedrive](https://stuhiteducn-my.sharepoint.com/:f:/g/personal/yhao-zhang_stu_hit_edu_cn/Ev1ZhrDUVU1EmJHg81y1-eYBdMRRbzb1SpXxQJtodMGsfg?e=NfFFXI)
+You can download the preprocessed **single-coil** tfrecord files via [my onedrive](https://stuhiteducn-my.sharepoint.com/:f:/g/personal/yhao-zhang_stu_hit_edu_cn/Ev1ZhrDUVU1EmJHg81y1-eYBdMRRbzb1SpXxQJtodMGsfg?e=NfFFXI). We do not provide the **multi-coil** tfrecord files since they are too large. 
 
 ## 2. Run the code
 
-run `main-bart.py` after the following steps done. u may change the `dirs` by yourself.
+run `main-bart.py` for single-coil dataset after the following steps done. u may change the `dirs` by yourself.
+
+run `main-bart-multicoil.py` for multi-coil dataset after the following steps done. u may change the `dirs` by yourself.
 
 ### 2.1 Download the data
 
